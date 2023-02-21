@@ -13,8 +13,6 @@ public class Model {
 	private List<Press> presses;
 	private List<Production> production;
 	
-	//DA METTERE I NUMERI RANDOM IN TONS DEGLI ORDERS
-	
 	public Model() {
 		this.dao = new Dao();
 		
@@ -24,7 +22,7 @@ public class Model {
 		
 		this.findPressesCt(this.presses, this.production);
 		this.setTonsRange(this.presses);
-		//Prendo le corrispondenze ?
+
 	}
 
 	// RICORSIONE
@@ -66,10 +64,11 @@ public class Model {
 	
 	public String optimize() {
 		List<Press> presses = new ArrayList<Press>(this.presses);
-	
+	    Collections.sort(presses);
+	    
 		String s = "";
 		
-		for (Press p : presses) {
+		for(Press p: presses) {
 			
 			this.time_used = 0;
 			this.time_stopped = 0;
@@ -171,6 +170,8 @@ public class Model {
 	}
 	
 	// SIMULAZIONE 
+	
+	// DEVO SALVARMI I RISULTATI DELLA RICORSIONE
 	
 	public String addOrderSim(Order order) {
 		// TODO Auto-generated method stub

@@ -75,12 +75,6 @@ public class Press implements Comparable<Press> {
 				"\n\tMin tons = "+this.minTons+"\n";
 	}
 
-	@Override
-	public int compareTo(Press o) {
-		
-		return this.tons-o.getTons();
-	}
-
 	public Integer getMinTons() {
 		return minTons;
 	}
@@ -89,4 +83,8 @@ public class Press implements Comparable<Press> {
 		this.minTons = minTons;
 	}
 	
+	@Override
+	public int compareTo(Press o) {
+		return this.tons-o.getTons();
+	}
 }
