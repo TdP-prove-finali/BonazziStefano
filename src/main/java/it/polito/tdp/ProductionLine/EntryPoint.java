@@ -1,23 +1,26 @@
 package it.polito.tdp.ProductionLine;
 
 import javafx.application.Application;
-import static javafx.application.Application.launch;
+import it.polito.tdp.ProductionLine.model.Model;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-
 public class EntryPoint extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
-        
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Scene.fxml"));
+    	Parent root = loader.load();
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
         scene.getRoot().setStyle("-fx-font-family: 'serif'");
 
+        Model model = new Model();
+        FXMLController controller = loader.getController();
+        controller.setModel(model);
+        
         stage.setTitle("JavaFX and Maven");
         stage.setScene(scene);
         stage.show();

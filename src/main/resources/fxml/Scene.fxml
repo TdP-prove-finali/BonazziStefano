@@ -2,25 +2,203 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-
-<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polito.tdp.ProductionLine.FXMLController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polito.tdp.ProductionLine.FXMLController">
    <center>
-      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" BorderPane.alignment="CENTER">
          <children>
-              <Button fx:id="button" onAction="#handleButtonAction" text="Click Me!" />
-              <Label fx:id="label" minHeight="16" minWidth="69">
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin>
+            <VBox fx:id="VBoxOptimize" alignment="CENTER" disable="true">
+               <children>
+                  <HBox spacing="10.0">
+                     <children>
+                        <Label text="New order" />
+                        <TextField fx:id="opt_order_date" promptText="date" />
+                        <TextField fx:id="opt_lot" promptText="lot number" />
+                        <TextField fx:id="opt_pieces" prefHeight="26.0" prefWidth="187.0" promptText="pieces" />
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" top="5.0" />
+                     </padding>
+                  </HBox>
+                  <HBox spacing="10.0">
+                     <children>
+                        <TextField fx:id="opt_tons" promptText="tons" />
+                        <TextField fx:id="opt_description" prefHeight="26.0" prefWidth="356.0" promptText="description" />
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="71.0" top="5.0" />
+                     </padding>
+                  </HBox>
+                  <HBox spacing="10.0">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="71.0" top="5.0" />
+                     </padding>
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#doAddOrderOpt" text="Add order" />
+                        <Button mnemonicParsing="false" onAction="#doRemoveOrderOpt" text="Remove order" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <children>
+                        <ComboBox fx:id="cmb_presses_opt" onAction="#doSelectPressOpt" promptText="Presses list" />
+                        <Button mnemonicParsing="false" onAction="#doOptimizeForPress" text="OTTIMIZZA SOLO PER LA PRESSA" />
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" />
+               </padding>
+            </VBox>
+            <HBox alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#doOptimize" text="OTTIMIZZA LA PRODUZIONE" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" top="5.0" />
+               </padding>
+            </HBox>
+            <VBox fx:id="VBoxSim" alignment="CENTER" disable="true">
+               <children>
+                  <HBox spacing="10.0">
+                     <children>
+                        <Label text="New press" />
+                        <TextField fx:id="sim_press" promptText="press" />
+                        <TextField fx:id="sim_press_tons" promptText="tons" />
+                        <TextField fx:id="sim_cycle_time" promptText="cycle time" />
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" top="5.0" />
+                     </padding>
+                  </HBox>
+                  <HBox layoutX="10.0" layoutY="190.0" spacing="10.0">
+                     <children>
+                        <TextField fx:id="sim_setup_time" promptText="setup time" />
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="71.0" top="5.0" />
+                     </padding>
+                  </HBox>
+                  <HBox spacing="10.0">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="71.0" top="5.0" />
+                     </padding>
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#doAddPressSim" text="Add press" />
+                        <Button mnemonicParsing="false" onAction="#doRemovePressSim" text="Remove press" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="10.0">
+                     <children>
+                        <Label prefHeight="17.0" prefWidth="55.0" text="error %" />
+                        <TextField fx:id="sim_error" promptText="error probability" />
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" top="5.0" />
+                     </padding>
+                  </HBox>
+                  <HBox spacing="10.0">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="71.0" top="5.0" />
+                     </padding>
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#doAddErrorSim" text="Add error" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <children>
+                        <ComboBox fx:id="cmb_presses_sim" onAction="#doSelectPressSim" promptText="Presses list" />
+                        <Button mnemonicParsing="false" onAction="#doSimForPress" text="SIMULA SOLO PER LA PRESSA" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" spacing="10.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#doSimulate" text="SIMULA " />
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" top="10.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <TextArea fx:id="txt_area" editable="false" promptText="Result data shown here" VBox.vgrow="ALWAYS">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </TextArea>
+               </children>
+            </VBox>
+         </children>
+         <BorderPane.margin>
+            <Insets left="10.0" right="10.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+   <padding>
+      <Insets bottom="5.0" />
+   </padding>
+   <top>
+      <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" text="Analisi e ottimizzazione di una linea di produzione industriale" textFill="#ff001e">
+               <font>
+                  <Font name="Arial Bold" size="20.0" />
+               </font>
+               <padding>
+                  <Insets left="5.0" right="5.0" />
+               </padding>
+            </Label>
+            <Label alignment="CENTER" contentDisplay="CENTER" text="nel settore automotive" textFill="#ff001e">
+               <font>
+                  <Font name="Arial Bold" size="20.0" />
+               </font>
+               <padding>
+                  <Insets left="5.0" right="5.0" />
+               </padding>
             </Label>
          </children>
          <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="5.0" top="5.0" />
          </padding>
-      </HBox>
-   </center>
+      </VBox>
+   </top>
 </BorderPane>
