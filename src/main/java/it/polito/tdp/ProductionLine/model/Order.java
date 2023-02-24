@@ -9,6 +9,8 @@ public class Order implements Comparable<Order>{
 	private Integer quantity;
 	private String description; 
 	private Integer tons;
+	private LocalDateTime finish;
+	private LocalDateTime start;
 	
 	public Order(LocalDateTime date, String lot_number, Integer quantity, String description, Integer tons) {
 		this.order_date = date;
@@ -16,6 +18,7 @@ public class Order implements Comparable<Order>{
 		this.quantity = quantity;
 		this.description = description;
 		this.tons = tons;
+		this.start = date;
 	}
 
 	public LocalDateTime getOrder_date() {
@@ -60,13 +63,30 @@ public class Order implements Comparable<Order>{
 
 	@Override
 	public int compareTo(Order o) {
-		return this.getOrder_date().compareTo(o.getOrder_date());
+		return this.getStart().compareTo(o.getStart());
 	}
 
 	@Override
 	public String toString() {
-		return "Order: lot number = " + lot_number + "\n\t order date = "+order_date + "\n\t quantity = " + quantity
-				+ "\n\t description = " + description + "\n\t tons = " + tons + "\n";
+		return "\tOrder lot number = " + lot_number + "\n\t\t order date = "+order_date + "\n\t\t quantity = " + quantity
+				+ "\n\t\t description = " + description + "\n\t\t tons = " + tons + "\n\t\t Start production = \t\t" + start
+				+ "\n\t\t Finish production =\t" + finish + "\n";
+	}
+
+	public LocalDateTime getFinish() {
+		return finish;
+	}
+
+	public void setFinish(LocalDateTime finish) {
+		this.finish = finish;
+	}
+
+	public LocalDateTime getStart() {
+		return start;
+	}
+
+	public void setStart(LocalDateTime start) {
+		this.start = start;
 	}
 	
 }

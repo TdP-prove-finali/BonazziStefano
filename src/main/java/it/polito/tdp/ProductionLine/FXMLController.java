@@ -6,8 +6,8 @@ package it.polito.tdp.ProductionLine;
 
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.ResourceBundle;
-
 import it.polito.tdp.ProductionLine.model.Model;
 import it.polito.tdp.ProductionLine.model.Order;
 import it.polito.tdp.ProductionLine.model.Press;
@@ -35,10 +35,10 @@ public class FXMLController {
     private VBox VBoxSim; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmb_presses_opt"
-    private ComboBox<?> cmb_presses_opt; // Value injected by FXMLLoader
+    private ComboBox<Press> cmb_presses_opt; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmb_presses_sim"
-    private ComboBox<?> cmb_presses_sim; // Value injected by FXMLLoader
+    private ComboBox<Press> cmb_presses_sim; // Value injected by FXMLLoader
 
     @FXML // fx:id="opt_description"
     private TextField opt_description; // Value injected by FXMLLoader
@@ -175,14 +175,25 @@ public class FXMLController {
 
     @FXML
     void doOptimize(ActionEvent event) {
-    	//Visibile il simula
     	String s = this.model.optimize();
     	this.txt_area.setText(s);
+    	
+    	this.VBoxOptimize.setDisable(false);
+    	this.VBoxSim.setDisable(false);
+    	
+    	List<Press> presses = this.model.getPresses();
+    	this.cmb_presses_sim.getItems().clear();
+    	this.cmb_presses_sim.getItems().addAll(presses);
+    	this.cmb_presses_opt.getItems().clear();
+    	this.cmb_presses_opt.getItems().addAll(presses);
     }
 
     @FXML
     void doOptimizeForPress(ActionEvent event) {
-
+    	Press p = this.cmb_presses_opt.getValue();
+    	String s = this.model.optimizeForPress(p);
+    	
+    	this.txt_area.setText(s);
     }
 
     @FXML
@@ -192,16 +203,6 @@ public class FXMLController {
 
     @FXML
     void doRemovePressSim(ActionEvent event) {
-
-    }
-
-    @FXML
-    void doSelectPressOpt(ActionEvent event) {
-
-    }
-
-    @FXML
-    void doSelectPressSim(ActionEvent event) {
 
     }
 

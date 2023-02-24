@@ -71,8 +71,8 @@ public class Press implements Comparable<Press> {
 
 	@Override
 	public String toString() {
-		return "Press: \n\tID = "+this.id+"\n\tMax tons = "+this.tons+
-				"\n\tMin tons = "+this.minTons+"\n";
+		return "PRESS n°" + this.id + " (tons from " + this.minTons
+				+ " to " + this.tons + ")";
 	}
 
 	public Integer getMinTons() {

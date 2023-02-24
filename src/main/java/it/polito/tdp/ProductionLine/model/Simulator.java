@@ -11,17 +11,19 @@ import it.polito.tdp.ProductionLine.model.Event.EventType;
 
 public class Simulator {
 	
-	// coda degli eventi
+	// Coda degli eventi
 	private PriorityQueue<Event> queue;
 	
-	//parametri
+	// Parametri
+	private double ct; 
 	private long time_used;
 	private long time_stopped;
 	private LocalDateTime date_finish;
+	private Result result;
 	
-	//modello del mondo
-	//private List<Order> orders;
+	// Modello del mondo
 	private Press press;
+	private List<Order> next_orders;
 		
 	public Simulator() {
 		this.queue = new PriorityQueue<Event>();
@@ -30,16 +32,18 @@ public class Simulator {
 	public void init(List<Order> orders, Press press) {
 		this.time_used = 0;
 		this.time_stopped = 0;
-		//this.orders = new ArrayList<>(orders);
 		this.press = press;
+		this.ct = this.press.getCycle_time();
 
-		List<Order> next_orders = new ArrayList<Order>(orders);
-		Order o = orders.get(0);
-		next_orders.remove(o);
+		this.next_orders = new ArrayList<Order>(orders);
+		this.result = new Result(press, null, null, 0, 0, null);
 		
-		Event e = new Event(o, next_orders, EventType.NEW_PRODUCTION, o.getOrder_date());
+		Order o = orders.get(0);
+		this.next_orders.remove(o);
+		
+		Event e = new Event(o, this.next_orders, EventType.NEW_PRODUCTION, o.getOrder_date());
 		this.queue.add(e);
-	
+		
 	}
 	
 	public void run() {
@@ -47,6 +51,10 @@ public class Simulator {
 			Event e = this.queue.poll();
 			this.processEvent(e);
 		}
+		
+		this.result.setT_used(time_used);
+		this.result.setT_stop(time_stopped);
+		this.result.setFinishDate(date_finish);
 	}
 
 	private void processEvent(Event e) {
@@ -54,16 +62,23 @@ public class Simulator {
 		switch (e.getType()) {
 		case NEW_PRODUCTION:
 			
-			int pieces = e.getOrder().getQuantity();
-			double ct = this.press.getCycle_time();  //Posso anche metterlo su
-			long processTime = (long) (pieces*ct);
+			this.result.getOrders().add(e.getOrder());
+			int i = this.result.getOrders().indexOf(e.getOrder());
 			
-			LocalDateTime releaseTime = e.getTime().plus(Duration.ofSeconds(processTime));
+			this.result.getOrders().get(i).setStart(e.getTime());
 			
-			// CONTROLLARE SE RISPETTA LA DATA D'EVASIONE E AGGIUNGERE IL TEMPO DI SETUP
+			int pieces = e.getOrder().getQuantity(); 
+			long processTime = (long) (pieces*this.ct);
+			
+			LocalDateTime time = e.getTime();
+			LocalDateTime releaseTime = time.plus(Duration.ofSeconds(processTime));
+			
+			this.result.getOrders().get(i).setFinish(releaseTime);
+			
+			// CONTROLLARE SE RISPETTA LA DATA D'EVASIONE E AGGIUNGERE IL TEMPO DI SETUP??? ERRORE???
 			
 			if(e.getNext_orders().isEmpty()) {
-				
+
 				Event new_e = new Event(null, null, EventType.FREE_PRESS, releaseTime);
 				this.queue.add(new_e);
 				
@@ -80,19 +95,18 @@ public class Simulator {
 				
 					Duration d = Duration.between(nextOrder_start.toLocalTime(), releaseTime.toLocalTime());
 					long seconds = (int) d.getSeconds();
-					//Viene negativo il valore?
 					
-					long unused = seconds + (days*24*60*60);
+					long unused = seconds + (-days*24*60*60);
 				
 					this.time_stopped = this.time_stopped + unused;
 					new_e = new Event(next, next_orders, EventType.NEW_PRODUCTION, nextOrder_start);
+					
 				} else {
-					//Gli cambio la data d'inizio
-					//MAGARI LA SALVO
-					next.setOrder_date(releaseTime);
+					
+					next.setStart(releaseTime);
 					new_e = new Event(next, next_orders, EventType.NEW_PRODUCTION, releaseTime);
+					
 				}
-				
 				
 				this.queue.add(new_e);
 				
@@ -109,28 +123,8 @@ public class Simulator {
 		
 	}
 
-	public long getTime_used() {
-		return time_used;
+	public Result getResult() {
+		return result;
 	}
-
-	public void setTime_used(long time_used) {
-		this.time_used = time_used;
-	}
-
-	public long getTime_stopped() {
-		return time_stopped;
-	}
-
-	public void setTime_stopped(long time_stopped) {
-		this.time_stopped = time_stopped;
-	}
-
-	public LocalDateTime getDate_finish() {
-		return date_finish;
-	}
-
-	public void setDate_finish(LocalDateTime date_finish) {
-		this.date_finish = date_finish;
-	}
-
+	
 }

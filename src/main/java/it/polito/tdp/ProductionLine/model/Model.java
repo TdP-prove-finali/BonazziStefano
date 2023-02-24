@@ -3,7 +3,10 @@ package it.polito.tdp.ProductionLine.model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import it.polito.tdp.ProductionLine.db.Dao;
 
 public class Model {
@@ -12,6 +15,7 @@ public class Model {
 	private List<Order> orders;
 	private List<Press> presses;
 	private List<Production> production;
+	private Map<Press, Result> results;
 	
 	public Model() {
 		this.dao = new Dao();
@@ -19,6 +23,7 @@ public class Model {
 		this.orders = this.dao.getOrders();
 		this.presses = this.dao.getPresses();
 		this.production = this.dao.getProduction();
+		this.results = new HashMap<>();
 		
 		this.findPressesCt(this.presses, this.production);
 		this.setTonsRange(this.presses);
@@ -46,20 +51,12 @@ public class Model {
 			
 			press.setCycle_time(mean);
 		}
-	}
 
-	private long time_used;
-	private long time_stopped;
-	private LocalDateTime date_finish;
+	}
 	
 	public String addOrderOpt(Order order) {
 		this.orders.add(order);
 		return "Aggiunto ordine: " + order.toString();
-	}
-	
-	public String addOrderOptToDataset(Order order) {
-		String s = this.dao.addOrderToDatabase(order);
-		return s;
 	}
 	
 	public String optimize() {
@@ -69,10 +66,6 @@ public class Model {
 		String s = "";
 		
 		for(Press p: presses) {
-			
-			this.time_used = 0;
-			this.time_stopped = 0;
-			this.date_finish = null;
 			
 			List<Order> allOrders = this.getOrdersInPress(p);
 			
@@ -84,10 +77,10 @@ public class Model {
 				List<Order> orders = new ArrayList<>();
 			
 				this.recursive(orders, toDo, allOrders, p);
-				// Salva i risultati
-				s = s+p+"\nTempo usato = "+this.time_used+"\nTempo ferma = "+-this.time_stopped+
-					"\nData fine = "+this.date_finish+"\n";
+				
 			}
+			
+			s = s + this.results.get(p) + "\n";
 		}
 		
 		return s;
@@ -97,21 +90,32 @@ public class Model {
 		if(orders.size() == allOrders.size()) {	
 			//Simulo alla fine
 			Simulator sim = new Simulator();
-			sim.init(orders, p);
-			sim.run();
 			
-			LocalDateTime finish = sim.getDate_finish();
-			
-			if(this.date_finish == null) {
-				this.date_finish = finish;
-				this.time_used = sim.getTime_used();
-				this.time_stopped = sim.getTime_stopped();
+			List<Order> orders2 = new ArrayList<Order>();
+			for (Order o : orders) {
+				Order order = new Order(o.getOrder_date(), o.getLot_number(), o.getQuantity(), o.getDescription(), o.getTons());
+				orders2.add(order);
 			}
 			
-			if(finish.isBefore(this.date_finish)) {
-				this.date_finish = finish;
-				this.time_used = sim.getTime_used();
-				this.time_stopped = sim.getTime_stopped();
+			sim.init(orders2, p);
+			sim.run();
+			
+			//MODIFICA L?ORDER DATE PERCHé?? NON VA A PRENDERE I RIFERIMENTI GIUSTI DEGLI ORDERS
+			
+			LocalDateTime finish = sim.getResult().getFinishDate();
+			
+			if(this.results.get(p) == null) {
+				Result result = new Result(p, null, orders2, sim.getResult().getT_used(),
+						sim.getResult().getT_stop(), sim.getResult().getFinishDate());
+				
+				this.results.put(p, result);
+			}
+			
+			if(finish.isBefore(this.results.get(p).getFinishDate())) {
+				Result result = new Result(p, null, orders2, sim.getResult().getT_used(),
+						sim.getResult().getT_stop(), sim.getResult().getFinishDate());
+				
+				this.results.put(p, result);
 			}
 			
 		} else {
@@ -193,6 +197,30 @@ public class Model {
 	public String simulate() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public List<Press> getPresses() {
+		return this.presses;
+	}
+
+	public String optimizeForPress(Press p) {
+		String s = "";
+					
+		List<Order> allOrders = this.getOrdersInPress(p);
+			
+		if(!allOrders.isEmpty()) {
+			
+			List<Order> toDo = new ArrayList<>(allOrders);
+			Collections.sort(allOrders);
+		
+			List<Order> orders = new ArrayList<>();
+			
+			this.recursive(orders, toDo, allOrders, p);
+			
+			s = s + this.results.get(p) + "\n";
+		}
+		
+		return s;
 	}
 
 }

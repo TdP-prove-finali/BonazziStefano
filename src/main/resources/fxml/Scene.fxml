@@ -60,7 +60,7 @@
                   </HBox>
                   <HBox alignment="CENTER" spacing="10.0">
                      <children>
-                        <ComboBox fx:id="cmb_presses_opt" onAction="#doSelectPressOpt" promptText="Presses list" />
+                        <ComboBox fx:id="cmb_presses_opt" promptText="Presses list" />
                         <Button mnemonicParsing="false" onAction="#doOptimizeForPress" text="OTTIMIZZA SOLO PER LA PRESSA" />
                      </children>
                   </HBox>
@@ -141,7 +141,7 @@
                   </HBox>
                   <HBox alignment="CENTER" spacing="10.0">
                      <children>
-                        <ComboBox fx:id="cmb_presses_sim" onAction="#doSelectPressSim" promptText="Presses list" />
+                        <ComboBox fx:id="cmb_presses_sim" promptText="Presses list" />
                         <Button mnemonicParsing="false" onAction="#doSimForPress" text="SIMULA SOLO PER LA PRESSA" />
                      </children>
                   </HBox>
