@@ -54,6 +54,8 @@ public class Event implements Comparable<Event> {
 		this.time = time;
 	}
 	
+	// Tecnicamente generando di volta in volta gli eventi non c'è bisogno del comparable per questa classe
+	
 	@Override
 	public int compareTo(Event o) {
 		if(this.time.isBefore(o.getTime())) 

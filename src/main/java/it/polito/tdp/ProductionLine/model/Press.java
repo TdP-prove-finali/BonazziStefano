@@ -1,24 +1,20 @@
 package it.polito.tdp.ProductionLine.model;
 
-import java.time.LocalDate;
+import java.util.Objects;
 
 public class Press implements Comparable<Press> {
 
 	private Integer id;
 	private Integer tons;
 	private Double cycle_time;
-	private Double setup_time;
-	private boolean occupied;
-	private LocalDate free;
+	private Long setup_time;
 	private Integer minTons;
 	
-	public Press(Integer id, Integer tons, Double cycle_time, Double setup_time) {
+	public Press(Integer id, Integer tons, Double cycle_time, Long setup_time) {
 		this.id = id;
 		this.tons = tons;
 		this.cycle_time = cycle_time;
 		this.setup_time = setup_time;
-		this.setOccupied(false);
-		this.setFree(null);
 	}
 
 	public Integer getId() {
@@ -45,36 +41,14 @@ public class Press implements Comparable<Press> {
 		this.cycle_time = cycle_time;
 	}
 
-	public Double getSetup_time() {
+	public Long getSetup_time() {
 		return setup_time;
 	}
 
-	public void setSetup_time(Double setup_time) {
+	public void setSetup_time(Long setup_time) {
 		this.setup_time = setup_time;
 	}
-
-	public boolean isOccupied() {
-		return occupied;
-	}
-
-	public void setOccupied(boolean occupied) {
-		this.occupied = occupied;
-	}
-
-	public LocalDate getFree() {
-		return free;
-	}
-
-	public void setFree(LocalDate localDate) {
-		this.free = localDate;
-	}
-
-	@Override
-	public String toString() {
-		return "PRESS n°" + this.id + " (tons from " + this.minTons
-				+ " to " + this.tons + ")";
-	}
-
+	
 	public Integer getMinTons() {
 		return minTons;
 	}
@@ -84,7 +58,33 @@ public class Press implements Comparable<Press> {
 	}
 	
 	@Override
+	public String toString() {
+		return "PRESS n°" + this.id + " (tons from " + this.minTons
+				+ " to " + this.tons + ")";
+	}
+
+	@Override
 	public int compareTo(Press o) {
 		return this.tons-o.getTons();
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(cycle_time, id, minTons, setup_time, tons);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Press other = (Press) obj;
+		return Objects.equals(cycle_time, other.cycle_time) && Objects.equals(id, other.id)
+				&& Objects.equals(minTons, other.minTons) && Objects.equals(setup_time, other.setup_time)
+				&& Objects.equals(tons, other.tons);
+	}
+	
 }

@@ -30,7 +30,183 @@ public class Model {
 
 	}
 
-	// RICORSIONE
+	// RICORSIONE e SIMULAZIONE
+	
+	public String optimize(double err) {
+		this.results = new HashMap<>();
+		List<Press> presses = new ArrayList<Press>(this.presses);
+	    Collections.sort(presses);
+	    
+		String s = "";
+		
+		for(Press p: presses) {
+			List<Order> allOrders = this.getOrdersInPress(p);
+			
+			if(!allOrders.isEmpty()) {
+				List<Order> toDo = new ArrayList<>(allOrders);
+				Collections.sort(allOrders);
+			
+				List<Order> orders = new ArrayList<>();
+			
+				this.recursive(orders, toDo, allOrders, p, err);
+			}
+			
+			if(this.results.get(p) == null) 
+				s = s + p + "\n\tNESSUN ORDINE DA ELABORARE O PARAMETRI DI CONSEGNA NON RISPETTATI\n";
+			else
+				s = s + this.results.get(p) + "\n";
+		}
+		
+		return s;
+	}
+	
+	private void recursive(List<Order> orders, List<Order> toDo, List<Order> allOrders, Press p, double err) {
+		
+		if(orders.size() == allOrders.size()) {	
+			Simulator sim = new Simulator();
+			
+			List<Order> orders2 = new ArrayList<Order>();
+			for (Order o : orders) {
+				Order order = new Order(o.getOrder_date(), o.getLot_number(), o.getQuantity(), o.getDescription(), o.getTons());
+				orders2.add(order);
+			}
+			
+			sim.init(orders2, p, err);
+			sim.run();
+			
+			LocalDateTime finish = sim.getResult().getFinishDate();
+			
+			if(sim.isValid()) {
+				if(!this.results.containsKey(p)) {
+					Result result = new Result(p, null, orders2, sim.getResult().getT_used(),
+							sim.getResult().getT_stop(), sim.getResult().getSetup_time(), sim.getResult().getFinishDate());
+				
+					this.results.put(p, result);
+				} else {
+				
+					if(finish.isBefore(this.results.get(p).getFinishDate()) || finish.isEqual(this.results.get(p).getFinishDate())) {
+						Result result;
+						if(finish.isEqual(this.results.get(p).getFinishDate())
+								&& sim.getResult().getEfficiency() <= this.results.get(p).getEfficiency()) {
+					
+								result = new Result(p, null, orders2, sim.getResult().getT_used(),
+									sim.getResult().getT_stop(), sim.getResult().getSetup_time(), sim.getResult().getFinishDate());
+								this.results.put(p, result);
+						} else {
+				
+							result = new Result(p, null, orders2, sim.getResult().getT_used(),
+								sim.getResult().getT_stop(), sim.getResult().getSetup_time(), sim.getResult().getFinishDate());
+							this.results.put(p, result);
+						}
+					}
+				}
+			}
+		} else {
+			for (Order o: toDo) {
+				orders.add(o);
+				List<Order> deepArray = new ArrayList<>(toDo);
+				deepArray.remove(o);
+				this.recursive(orders, deepArray, allOrders, p, err);
+				orders.remove(o);
+			}
+		}
+	}
+	
+	public String optimizeForPress(Press p, double err) {
+		this.results = new HashMap<>();
+		String s = "";
+					
+		List<Order> allOrders = this.getOrdersInPress(p);
+			
+		if(!allOrders.isEmpty()) {
+			List<Order> toDo = new ArrayList<>(allOrders);
+			Collections.sort(allOrders);
+		
+			List<Order> orders = new ArrayList<>();
+			
+			this.recursive(orders, toDo, allOrders, p, err);
+			
+			if(this.results.get(p) == null) 
+				s = s + p + "\n\tNESSUN ORDINE DA ELABORARE O PARAMETRI DI CONSEGNA NON RISPETTATI\n";
+			else
+				s = s + this.results.get(p) + "\n";
+		}
+		
+		return s;
+	}
+
+	// OTHERS
+	
+	public List<Press> getPresses() {
+		Collections.sort(this.presses);
+		return this.presses;
+	}
+
+	public String addOrderOpt(LocalDateTime date, String lot, Integer pieces, String description, Integer tons) {
+		Order order = new Order(date, lot, pieces, description, tons);
+		this.orders.add(order);
+		return "Aggiunto ordine: " + order.toString();
+	}
+	
+	public String addPressSim(Press press) {
+		this.presses.add(press);
+		this.setTonsRange(this.presses);
+		return "Correctly added " + press;
+	}
+	
+	public String removeOrder(String lot) {
+		int i = -1;
+		Order o = null;
+		for (Order order : orders) {
+			if(order.getLot_number().compareTo(lot) == 0) {
+				i = orders.indexOf(order);
+			    o = order;
+			}
+		}
+		
+		if(i == -1) 
+			return "Ordine non presente o numero del lotto inseatto\n";
+		
+		this.orders.remove(i);
+		
+		return "Rimosso ordine:\n"+o;
+	}
+	
+	public String removePress(Integer id) {
+		int i = -1;
+		Press p = null;
+		for (Press press : presses) {
+			if(press.getId() == id) {
+				i = presses.indexOf(press);
+			    p = press;
+			}
+		}
+		
+		if(i == -1) 
+			return "Pressa non presente o ID inseatto\n";
+		
+		this.presses.remove(i);
+		this.setTonsRange(this.presses);
+		
+		return "Rimossa press:\n"+p;
+	}
+	
+	private List<Order> getOrdersInPress(Press p) {
+		List<Order> result = new ArrayList<Order>();		
+		
+		for (Order o: this.orders) {
+			int oTons = o.getTons();
+			int pMinTons = p.getMinTons();
+			int pMaxTons = p.getTons();
+			
+			if(oTons >= pMinTons && oTons <= pMaxTons) {
+				Order order = new Order(o.getOrder_date(), o.getLot_number(), o.getQuantity(), o.getDescription(), o.getTons());
+				result.add(order);
+			}
+		}
+		
+		return result;
+	}
 	
 	private void findPressesCt(List<Press> presses, List<Production> production) {
 		for (Press press : presses) {
@@ -51,106 +227,6 @@ public class Model {
 			
 			press.setCycle_time(mean);
 		}
-
-	}
-	
-	public String addOrderOpt(Order order) {
-		this.orders.add(order);
-		return "Aggiunto ordine: " + order.toString();
-	}
-	
-	public String optimize() {
-		List<Press> presses = new ArrayList<Press>(this.presses);
-	    Collections.sort(presses);
-	    
-		String s = "";
-		
-		for(Press p: presses) {
-			
-			List<Order> allOrders = this.getOrdersInPress(p);
-			
-			if(!allOrders.isEmpty()) {
-			
-				List<Order> toDo = new ArrayList<>(allOrders);
-				Collections.sort(allOrders);
-			
-				List<Order> orders = new ArrayList<>();
-			
-				this.recursive(orders, toDo, allOrders, p);
-				
-			}
-			
-			s = s + this.results.get(p) + "\n";
-		}
-		
-		return s;
-	}
-	
-	private void recursive(List<Order> orders, List<Order> toDo, List<Order> allOrders, Press p) {
-		if(orders.size() == allOrders.size()) {	
-			//Simulo alla fine
-			Simulator sim = new Simulator();
-			
-			List<Order> orders2 = new ArrayList<Order>();
-			for (Order o : orders) {
-				Order order = new Order(o.getOrder_date(), o.getLot_number(), o.getQuantity(), o.getDescription(), o.getTons());
-				orders2.add(order);
-			}
-			
-			sim.init(orders2, p);
-			sim.run();
-			
-			//MODIFICA L?ORDER DATE PERCHé?? NON VA A PRENDERE I RIFERIMENTI GIUSTI DEGLI ORDERS
-			
-			LocalDateTime finish = sim.getResult().getFinishDate();
-			
-			if(this.results.get(p) == null) {
-				Result result = new Result(p, null, orders2, sim.getResult().getT_used(),
-						sim.getResult().getT_stop(), sim.getResult().getFinishDate());
-				
-				this.results.put(p, result);
-			}
-			
-			if(finish.isBefore(this.results.get(p).getFinishDate())) {
-				Result result = new Result(p, null, orders2, sim.getResult().getT_used(),
-						sim.getResult().getT_stop(), sim.getResult().getFinishDate());
-				
-				this.results.put(p, result);
-			}
-			
-		} else {
-			
-			for (Order o: toDo) {
-				// vado in profondità
-				orders.add(o);
-				List<Order> deepArray = new ArrayList<>(toDo);
-				deepArray.remove(o);
-				this.recursive(orders, deepArray, allOrders, p);
-				orders.remove(o);
-			}
-		}
-	}
-	
-	private List<Order> getOrdersInPress(Press p) {
-		List<Order> result = new ArrayList<Order>();
-		List<Order> orders2 = new ArrayList<Order>();
-		
-		for (Order o : this.orders) {
-			Order order = new Order(o.getOrder_date(), o.getLot_number(), o.getQuantity(), o.getDescription(), o.getTons());
-			orders2.add(order);
-		}
-		
-		for (Order o: orders2) {
-			int oTons = o.getTons();
-			int pMinTons = p.getMinTons();
-			int pMaxTons = p.getTons();
-			
-			if(oTons >= pMinTons && oTons <= pMaxTons) {
-				result.add(o);
-			}
-		}
-		
-		return result;
 	}
 	
 	private void setTonsRange(List<Press> presses) {
@@ -161,9 +237,8 @@ public class Model {
 			Press p1 = allPresses.get(i);
 			Press p2;
 			
-			if(i == 0) {
+			if(i == 0) 
 				p1.setMinTons(0);
-			}
 			
 			if(i-1>=0) {
 				p2 = allPresses.get(i-1);
@@ -172,55 +247,37 @@ public class Model {
 			} 
 		}
 	}
-	
-	// SIMULAZIONE 
-	
-	// DEVO SALVARMI I RISULTATI DELLA RICORSIONE
-	
-	public String addOrderSim(Order order) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-
-	public String addPressSim(Press press) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	public String addErrorSim(Double error_probability) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String simulate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<Press> getPresses() {
-		return this.presses;
-	}
-
-	public String optimizeForPress(Press p) {
-		String s = "";
-					
-		List<Order> allOrders = this.getOrdersInPress(p);
-			
-		if(!allOrders.isEmpty()) {
-			
-			List<Order> toDo = new ArrayList<>(allOrders);
-			Collections.sort(allOrders);
-		
-			List<Order> orders = new ArrayList<>();
-			
-			this.recursive(orders, toDo, allOrders, p);
-			
-			s = s + this.results.get(p) + "\n";
+	public List<Order> sizePress(int tons) {
+		List<Order> result;		
+		Press press = null;
+		for (Press p : this.presses) {
+			if(tons <= p.getTons() && tons > p.getMinTons()) 
+				press = p;
 		}
 		
-		return s;
+		if(press == null) 
+			return null;
+		
+		result = this.getOrdersInPress(press);
+		
+		return result;
 	}
-
+	
+	public boolean isPresent(String lot, Integer pressId) {
+		if (lot != null) {
+			for (Order order : orders) {
+				if(order.getLot_number().compareTo(lot) == 0) 
+					return true;
+			}
+		} else if (pressId != null){
+			for (Press press : presses) {
+				if(press.getId() == pressId) 
+					return true;
+			}
+		}
+		
+		return false;
+	}
+	
 }

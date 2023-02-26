@@ -2,6 +2,7 @@ package it.polito.tdp.ProductionLine.model;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 public class Production {
 
@@ -130,6 +131,29 @@ public class Production {
 
 	public void setProduction_lot(String production_lot) {
 		this.production_lot = production_lot;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(CODINTPRO, cavities, cycle_time, end_date, end_hour, opened_cavities, press,
+				producted_items, productionId, production_lot, start_date, start_hour);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Production other = (Production) obj;
+		return Objects.equals(CODINTPRO, other.CODINTPRO) && cavities == other.cavities
+				&& Objects.equals(cycle_time, other.cycle_time) && Objects.equals(end_date, other.end_date)
+				&& Objects.equals(end_hour, other.end_hour) && opened_cavities == other.opened_cavities
+				&& press == other.press && producted_items == other.producted_items
+				&& productionId == other.productionId && Objects.equals(production_lot, other.production_lot)
+				&& Objects.equals(start_date, other.start_date) && Objects.equals(start_hour, other.start_hour);
 	}
 	
 }

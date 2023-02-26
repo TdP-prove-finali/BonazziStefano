@@ -15,10 +15,11 @@ public class DBConnect {
 		if (ds == null) {
 			HikariConfig config = new HikariConfig();
 			config.setJdbcUrl(jdbcURL);
+			
+			// Inserire username e password per l'accesso al database SQL
 			config.setUsername("stefanobonazzi");
 			config.setPassword("psw2810");
 			
-			// configurazione MySQL
 			config.addDataSourceProperty("cachePrepStmts", "true");
 			config.addDataSourceProperty("prepStmtCacheSize", "250");
 			config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -34,4 +35,5 @@ public class DBConnect {
 			return null;
 		}
 	}
+	
 }

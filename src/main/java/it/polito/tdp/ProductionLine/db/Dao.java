@@ -47,7 +47,7 @@ public class Dao {
 
 			while (res.next()) {
 				result.add(new Press(res.getInt("id"), res.getInt("tons"),
-						res.getDouble("cycle_time"), res.getDouble("setup_time")));
+						res.getDouble("cycle_time"), (long) res.getDouble("setup_time")));
 			}
 			
 			conn.close();
