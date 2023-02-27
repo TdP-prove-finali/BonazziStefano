@@ -143,6 +143,12 @@ public class Model {
 	}
 
 	public String addOrderOpt(LocalDateTime date, String lot, Integer pieces, String description, Integer tons) {
+		for (Order o : this.orders) {
+			if(o.getLot_number().compareTo(lot) == 0) 
+				return "Ordine già presente\n";
+			
+		}
+	
 		Order order = new Order(date, lot, pieces, description, tons);
 		this.orders.add(order);
 		this.dao.addOrder(order);
@@ -150,6 +156,11 @@ public class Model {
 	}
 	
 	public String addPressSim(Press press) {
+		for (Press p : presses) {
+			if(p.getId() == press.getId()) 
+				return "Pressa già presente\n";
+		}
+		
 		this.presses.add(press);
 		this.dao.addPress(press);
 		this.setTonsRange(this.presses);
