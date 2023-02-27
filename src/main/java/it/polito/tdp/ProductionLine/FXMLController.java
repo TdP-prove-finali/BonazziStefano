@@ -249,6 +249,11 @@ public class FXMLController {
     	s = s + "\n\nATTENZIONE: LA RIMOZIONE DI UNA PRESSA PUO' COMPORTARE UN ACCUMULO DI ORDINI SU UN'ALTRA PRESSA "
     			+ "INCORRENDO IN UN TROPPO ALTO NUMERO DI COMBINAZIONI DA ANALIZZARE PER L'OTTIMIZZAZIONE.";
     	this.txt_area.setText(s);
+    	List<Press> presses = this.model.getPresses();
+    	this.cmb_presses_sim.getItems().clear();
+    	this.cmb_presses_sim.getItems().addAll(presses);
+    	this.cmb_presses_opt.getItems().clear();
+    	this.cmb_presses_opt.getItems().addAll(presses);
     }
 
     @FXML

@@ -145,11 +145,13 @@ public class Model {
 	public String addOrderOpt(LocalDateTime date, String lot, Integer pieces, String description, Integer tons) {
 		Order order = new Order(date, lot, pieces, description, tons);
 		this.orders.add(order);
-		return "Aggiunto ordine: " + order.toString();
+		this.dao.addOrder(order);
+		return "Aggiunto ordine:\n" + order.toString();
 	}
 	
 	public String addPressSim(Press press) {
 		this.presses.add(press);
+		this.dao.addPress(press);
 		this.setTonsRange(this.presses);
 		return "Correctly added " + press;
 	}
@@ -168,6 +170,7 @@ public class Model {
 			return "Ordine non presente o numero del lotto inseatto\n";
 		
 		this.orders.remove(i);
+		this.dao.removeOrder(o);
 		
 		return "Rimosso ordine:\n"+o;
 	}
@@ -186,6 +189,7 @@ public class Model {
 			return "Pressa non presente o ID inseatto\n";
 		
 		this.presses.remove(i);
+		this.dao.removePress(p);
 		this.setTonsRange(this.presses);
 		
 		return "Rimossa press:\n"+p;

@@ -112,6 +112,7 @@ public class Simulator {
 
 				Event new_e = new Event(null, null, EventType.FREE_PRESS, releaseTime);
 				this.queue.add(new_e);
+				this.time_used = this.time_used + processTime;
 				
 			} else {
 				Event new_e;

@@ -88,7 +88,7 @@ public class Result {
 	}
 
 	public double getSetup_time() {
-		double r = this.setup_time/ (double)this.orders.size();
+		double r = this.setup_time/(double)this.orders.size();
 		return r;
 	}
 

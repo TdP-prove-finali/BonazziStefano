@@ -19,7 +19,6 @@ public class Order implements Comparable<Order> {
 		this.quantity = quantity;
 		this.description = description;
 		this.tons = tons;
-		this.start = date;
 	}
 
 	public LocalDateTime getOrder_date() {
@@ -85,7 +84,7 @@ public class Order implements Comparable<Order> {
 	
 	@Override
 	public String toString() {
-		return "\tOrder lot number = " + lot_number + "\n\t\t order date = "+order_date + "\n\t\t quantity = " + quantity
+		return "\tOrder lot number = " + lot_number + "\n\t\t order date = " + order_date + "\n\t\t quantity = " + quantity
 				+ "\n\t\t description = " + description + "\n\t\t tons = " + tons + "\n\t\t Start production = \t\t" + start
 				+ "\n\t\t Finish production =\t" + finish + "\n";
 	}

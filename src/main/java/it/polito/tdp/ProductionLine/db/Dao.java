@@ -23,8 +23,8 @@ public class Dao {
 			ResultSet res = st.executeQuery();
 
 			while (res.next()) {
-				result.add(new Order(LocalDateTime.parse(res.getDate("Data Inizio").toString()+"T"+res.getTime("Data Inizio").toString()), res.getString("Lotto prod."),
-						res.getInt("Quantità utilizzo"), res.getString("Descrizione articolo"), res.getInt("tons")));
+				result.add(new Order(LocalDateTime.parse(res.getDate("order_date").toString()+"T"+res.getTime("order_date").toString()), res.getString("lot"),
+						res.getInt("pieces"), res.getString("description"), res.getInt("tons")));
 			}
 			
 			conn.close();
@@ -84,4 +84,84 @@ public class Dao {
 		return result;
 	}
 	
+	public boolean addOrder(Order o) {
+		final String sql = "INSERT INTO orders(order_date, lot, pieces, description, tons) " + 
+				" values(?, ?, ?, ?, ?)";
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			st.setString(1, o.getOrder_date().toString());
+			st.setString(2, o.getLot_number());
+			st.setInt(3, o.getQuantity());
+			st.setString(4, o.getDescription());
+			st.setInt(5, o.getTons());
+			
+			st.executeQuery();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean addPress(Press p) {
+		final String sql = "INSERT INTO presses(id, tons, cycle_time, setup_time) " + 
+				" values(?, ?, ?, ?)";
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			st.setInt(1, p.getId());
+			st.setInt(2, p.getTons());
+			st.setDouble(3, p.getCycle_time());
+			st.setDouble(4, p.getSetup_time());
+			
+			st.executeQuery();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean removeOrder(Order o) {
+		final String sql = "DELETE FROM orders " + 
+				"WHERE lot = ?";
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+		
+			st.setString(1, o.getLot_number());
+			st.executeQuery();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean removePress(Press p) {
+		final String sql = "DELETE FROM presses " + 
+				"WHERE id = ?";
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+		
+			st.setInt(1, p.getId());
+			st.executeQuery();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
 }
